@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>منصّة الاخبار الرياضية بتحفيظ الخوبة والأخبار العاجلة </title>
+
+
+  <style>
+    :root{
+      --brand:#0b5ebd; --bg:#f4f6f9; --card:#fff; --line:#e3e7ee;
+      --text:#0d2640; --muted:#6b7a90; --badge-primary:#0aa06e; --badge-middle:#8a2be2;
+      --shadow:0 6px 18px rgba(10, 30, 60, .06);
+      --danger:#b42318; --ok:#0a6d4b; --violet:#8a2be2;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Segoe UI', Tahoma, Arial, sans-serif}
+    header{background:linear-gradient(180deg,#0b5ebd 0,#074d9b 100%);color:#fff;padding:18px 12px;text-align:center}
+    header h1{margin:0 0 4px;font-weight:900;font-size:clamp(20px,3.5vw,30px)}
+    header p{margin:0;opacity:.9}
+
+    /* Ticker */
+    .ticker-wrap{position:relative;background:#0b5ebd;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.25)}
+    .ticker-inner{display:flex;gap:12px;white-space:nowrap;align-items:center;min-height:44px;padding:8px 12px}
+    .ticker-label{font-weight:900;background:#ffcc00;color:#062a5c;padding:4px 10px;border-radius:999px}
+    .ticker-viewport{flex:1;overflow:hidden;mask-image:linear-gradient(to left, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)}
+    .ticker-track{display:inline-flex;gap:22px;align-items:center;will-change:transform;animation:tickerMove 26s linear infinite}
+    .ticker-item{display:inline-flex;gap:8px;align-items:center;font-weight:800}
+    .ticker-item .time{font-size:12px;opacity:.9;background:rgba(255,255,255,.16);padding:2px 8px;border-radius:8px}
+    .ticker-wrap:hover .ticker-track{animation-play-state:paused}
+    @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    .toolbar,.ticker-tools{
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;
+      background:#fff;border-bottom:1px solid var(--line);padding:10px
+    }
+    .btn{
+      background:var(--brand);color:#fff;border:0;border-radius:12px;
+      padding:9px 14px;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.06);
+      transition:transform .08s ease, filter .15s ease;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn:hover{filter:brightness(1.03)}
+    .btn.secondary{background:#fff;color:var(--brand);border:2px solid var(--brand);box-shadow:none}
+    .btn.danger{background:var(--danger)}
+    .btn.violet{background:var(--violet)}
+    input[type=file]{display:none}
+    .ticker-tools input[type=text]{
+      flex:1;min-width:220px;padding:10px;border:1px solid var(--line);border-radius:12px;
+      outline:none;transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .ticker-tools input[type=text]:focus{border-color:#9cc3ff; box-shadow:0 0 0 4px rgba(11,94,189,.12)}
+
+    .container{display:flex;gap:20px;max-width:1200px;margin:18px auto;padding:0 12px}
+    .main{flex:2;display:flex;flex-direction:column;gap:18px}
+    .side{flex:1}
+
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:16px;
+      box-shadow:var(--shadow); overflow:hidden
+    }
+    .card header{
+      background:#f7f9fc;color:var(--text);border-bottom:1px solid var(--line);
+      padding:12px 14px;text-align:inherit
+    }
+    .card header h2{margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
+    .section-body{padding:14px}
+
+    .news-list{display:flex;flex-direction:column;gap:10px}
+    .news-item{
+      display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+      padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff
+    }
+    .news-title{font-weight:900; line-height:1.6}
+    .news-meta{font-size:12px;color:var(--muted)}
+
+    .phase-badge{
+      font-size:12px;font-weight:900;color:#fff;border-radius:999px;padding:5px 10px;white-space:nowrap
+    }
+    .phase-primary{background:var(--badge-primary)}
+    .phase-middle{background:var(--badge-middle)}
+
+    .match-card{
+      display:grid;grid-template-columns:auto 1fr auto 1fr;gap:10px;align-items:center;
+      padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-bottom:10px
+    }
+    .team-row{display:flex;align-items:center;gap:8px;font-weight:800}
+    .score{
+      font-weight:950;font-size:20px;color:#113a7a;background:#f1f5fb;border:1px dashed #cfe1ff;
+      padding:6px 10px;border-radius:12px;min-width:74px;text-align:center
+    }
+    .chip{font-size:12px;color:#334155;background:#eef2f7;border:1px solid #d7dee8;border-radius:999px;padding:4px 10px}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .empty{color:#9aa6b2;font-style:italic}
+
+    /* Chat */
+    .chat-wrap{display:flex;flex-direction:column;height:520px}
+    .chat-box{
+      flex:1;border:1px solid var(--line);background:#fbfcfe;padding:10px;overflow-y:auto;border-radius:14px
+    }
+    .msg{
+      background:#eaf2ff;border:1px solid #cfe1ff;padding:8px 10px;border-radius:12px;margin-bottom:8px
+    }
+    .msg .meta{font-size:12px;color:#2b4b83;opacity:.9;margin-bottom:3px;font-weight:800}
+    .chat-input{display:flex;gap:8px;margin-top:10px}
+    .chat-input input{
+      flex:1;padding:12px;border:1px solid var(--line);border-radius:14px;outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .chat-input input:focus{border-color:#9cc3ff;box-shadow:0 0 0 4px rgba(11,94,189,.12)}
+    .chat-input button{padding:12px 16px;border-radius:14px;border:0;background:var(--brand);color:#fff;font-weight:900;cursor:pointer}
+
+    /* Toast */
+    .toast-wrap{position:fixed;left:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+    .toast{
+      background:#0d2640;color:#fff;border-radius:14px;padding:10px 12px;min-width:240px;
+      box-shadow:0 10px 25px rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12);
+      animation:toastIn .18s ease-out;
+    }
+    .toast small{opacity:.9}
+    .toast.ok{background:var(--ok)}
+    .toast.warn{background:var(--violet)}
+    .toast.err{background:var(--danger)}
+    @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    /* Admin Modal */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;justify-content:center;
+      z-index:9998;
+    }
+    .modal{
+      width:min(1100px, 100%);
+      background:#fff;border-top-left-radius:20px;border-top-right-radius:20px;
+      border:1px solid rgba(255,255,255,.25);
+      box-shadow:0 18px 50px rgba(0,0,0,.25);
+      overflow:hidden;
+      max-height:86vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-head{
+      padding:12px 14px;background:#f7f9fc;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .modal-head strong{font-size:16px}
+    .modal-body{padding:14px;overflow:auto}
+    .admin-grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .admin-tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer}
+    .tab-btn.active{background:rgba(11,94,189,.1);border-color:#9cc3ff}
+    .admin-panel{display:none}
+    .admin-panel.active{display:block}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-weight:900;color:#1b3b66;font-size:13px}
+    .field input,.field select,.field textarea{
+      padding:10px;border:1px solid var(--line);border-radius:12px;outline:none;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:#9cc3ff;box-shadow:0 0 0 4px rgba(11,94,189,.12)}
+    .admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .hint{color:var(--muted);font-size:12px;line-height:1.6}
+    .divider{height:1px;background:var(--line);margin:12px 0}
+    .small-list{display:flex;flex-direction:column;gap:8px}
+    .small-item{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .small-item b{font-weight:900}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.ok{background:#16a34a}
+    .dot.err{background:#ef4444}
+    .dot.warn{background:#f59e0b}
+
+    @media(max-width:980px){
+      .container{flex-direction:column}
+      .chat-wrap{height:480px}
+      .form-row{grid-template-columns:1fr}
+      .modal-backdrop{align-items:flex-end}
+    }
+  
+/* Hide admin tools by default */
+.ticker-tools, .toolbar {
+    display: none !important;
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <h1>منصّة متابعة المباريات – الابتدائي + المتوسطة</h1>
+    <p>واجهة موحّدة مع شريط أخبار عاجلة ودردشة جماعية</p>
+  </header>
+
+  <div class="ticker-wrap" aria-live="polite" aria-label="أخبار عاجلة">
+    <div class="ticker-inner">
+      <span class="ticker-label">عاجل</span>
+      <div class="ticker-viewport">
+        <div class="ticker-track" id="tickerTrack"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-tools">
+    <input id="tickerInput" type="text" placeholder="اكتب الخبر العاجل هنا (مثال: فوز ابتدائية الخوبة 3–1)"/>
+    <button id="tickerAdd" class="btn">➕ إضافة للـTicker</button>
+    <button id="tickerClear" class="btn secondary">🧹 مسح الأخبار</button>
+    <button id="tickerExport" class="btn secondary">⬇️ تصدير أخبار (JSON)</button>
+    <label for="tickerImport" class="btn secondary" style="cursor:pointer;">⬆️ استيراد أخبار</label>
+    <input id="tickerImport" type="file" accept="application/json"/>
+  </div>
+
+  <div class="toolbar" role="group" aria-label="أدوات">
+    <label class="btn secondary" for="import-primary">⤴️ استيراد حالة الابتدائي (JSON)</label>
+    <input id="import-primary" type="file" accept="application/json" />
+    <label class="btn secondary" for="import-middle">⤴️ استيراد حالة المتوسط (JSON)</label>
+    <input id="import-middle" type="file" accept="application/json" />
+    <button class="btn" id="btn-refresh">🔄 تحديث العرض</button>
+    <button class="btn secondary" id="btn-clear">🧹 مسح الحالات المخصّصة</button>
+
+    <!-- زر لوحة المشرف -->
+    <button class="btn violet" id="btn-admin">🛡 لوحة المشرف</button>
+  </div>
+
+  <div class="container">
+    <div class="main">
+      <section class="card">
+        <header><h2>📰 آخر الأخبار (ابتدائي + متوسط)</h2></header>
+        <div class="section-body">
+          <div class="news-list" id="newsList"><div class="empty">لا توجد أخبار بعد…</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header><h2>🎯 المباريات الجارية الآن</h2></header>
+        <div class="section-body">
+          <div id="liveList" class="list"><div class="empty">لا توجد مباريات جارية حالياً.</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header><h2>📅 المباريات القادمة</h2></header>
+        <div class="section-body">
+          <div id="upcomingList" class="list"><div class="empty">سيتم عرض المباريات القادمة هنا.</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header><h2>📊 النتائج الأخيرة</h2></header>
+        <div class="section-body">
+          <div id="resultsList" class="list"><div class="empty">لا توجد نتائج مُسجّلة بعد.</div></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <section class="card">
+        <header><h2>💬 نقاش – مجتمع JZN BOYS</h2></header>
+        <div class="section-body">
+          <div class="chat-wrap">
+            <div class="chat-box" id="chatBox">
+              <div class="msg">
+                <div class="meta">✔ النظام</div>
+                تم تفعيل الدردشة الحية. اكتب رسالتك للمشاركة.
+              </div>
+            </div>
+
+            <div class="chat-input">
+              <input id="chatMsg" type="text" placeholder="اكتب رسالتك…" autocomplete="off"/>
+              <button id="chatSend">إرسال</button>
+            </div>
+
+            <div class="hint" id="chatLockHint" style="display:none;margin-top:8px">
+              🔒 الدردشة مقفلة بواسطة المشرف.
+            </div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Admin Modal -->
+  <div class="modal-backdrop" id="adminBackdrop" role="dialog" aria-modal="true" aria-label="لوحة المشرف">
+    <div class="modal">
+      <div class="modal-head">
+        <strong>🛡 لوحة تحكم المشرف</strong>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="status-pill" id="fbStatusPill" title="حالة Firebase">
+            <span class="dot warn" id="fbDot"></span>
+            <span id="fbStatusText">جارٍ التحقق…</span>
+          </span>
+          <button class="btn secondary" id="adminClose">إغلاق</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="admin-tabs">
+          <button class="tab-btn active" data-tab="tab-login" id="tabBtnLogin">تسجيل الدخول</button>
+          <button class="tab-btn" data-tab="tab-matches" id="tabBtnMatches" disabled>النتائج والمباريات</button>
+          <button class="tab-btn" data-tab="tab-ticker" id="tabBtnTicker" disabled>الأخبار العاجلة</button>
+          <button class="tab-btn" data-tab="tab-chat" id="tabBtnChat" disabled>الدردشة</button>
+          <button class="tab-btn" data-tab="tab-security" id="tabBtnSecurity" disabled>الأمان / PIN</button>
+        </div>
+
+        <div class="admin-grid">
+          <!-- LOGIN -->
+          <section class="admin-panel active" id="tab-login">
+            <div class="form-row">
+              <div class="field">
+                <label>رمز المشرف (PIN)</label>
+                <input id="adminPinInput" type="password" inputmode="numeric" placeholder="أدخل PIN للمشرف" />
+                <div class="hint">PIN الافتراضي: <b>2580</b> (غيّره بعد أول دخول)</div>
+              </div>
+              <div class="field">
+                <label>إجراءات</label>
+                <div class="admin-actions">
+                  <button class="btn violet" id="adminLoginBtn">دخول</button>
+                  <button class="btn secondary" id="adminLogoutBtn" disabled>تسجيل خروج</button>
+                </div>
+                <div class="hint">تنبيه: هذه حماية واجهة فقط (Front-End). للحماية الكاملة نحتاج Rules + Auth.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- MATCHES -->
+          <section class="admin-panel" id="tab-matches">
+            <div class="form-row">
+              <div class="field">
+                <label>المرحلة</label>
+                <select id="adminPhase">
+                  <option value="primary">ابتدائي</option>
+                  <option value="middle">متوسط</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>المباراة</label>
+                <select id="adminMatchId"></select>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="form-row">
+              <div class="field">
+                <label>نتيجة الفريق A</label>
+                <input id="adminAScore" type="number" min="0" placeholder="مثال: 2" />
+              </div>
+              <div class="field">
+                <label>نتيجة الفريق B</label>
+                <input id="adminBScore" type="number" min="0" placeholder="مثال: 1" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top:10px">
+              <div class="field">
+                <label>الفائز (اختياري)</label>
+                <select id="adminWinner">
+                  <option value="">— بدون فائز (مباراة جارية) —</option>
+                </select>
+                <div class="hint">إن حددت فائز + أهداف للطرفين = تُسجل “نتيجة”. إذا تركته فارغًا مع أهداف = “جارية”.</div>
+              </div>
+              <div class="field">
+                <label>معلومات المباراة</label>
+                <textarea id="adminMatchInfo" rows="3" readonly></textarea>
+              </div>
+            </div>
+
+            <div class="admin-actions">
+              <button class="btn" id="adminSaveLive">💾 حفظ كـ “جارية”</button>
+              <button class="btn violet" id="adminSaveResult">🏁 حفظ كـ “نتيجة”</button>
+              <button class="btn danger" id="adminClearMatch">🧹 مسح (إرجاع لقادمة)</button>
+            </div>
+          </section>
+
+          <!-- TICKER -->
+          <section class="admin-panel" id="tab-ticker">
+            <div class="form-row">
+              <div class="field" style="grid-column:1/-1">
+                <label>إضافة خبر عاجل</label>
+                <input id="adminTickerText" type="text" placeholder="اكتب الخبر..." />
+                <div class="admin-actions">
+                  <button class="btn" id="adminTickerAdd">➕ إضافة</button>
+                  <button class="btn secondary" id="adminTickerReload">🔄 تحديث القائمة</button>
+                  <button class="btn danger" id="adminTickerWipe">🧹 مسح الكل</button>
+                </div>
+                <div class="hint">هذه الأخبار تُحفظ محليًا في المتصفح (localStorage) مثل النسخة الأصلية.</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="small-list" id="adminTickerList"></div>
+          </section>
+
+          <!-- CHAT -->
+          <section class="admin-panel" id="tab-chat">
+            <div class="form-row">
+              <div class="field">
+                <label>قفل الدردشة للجميع</label>
+                <select id="adminChatLock">
+                  <option value="off">مفتوحة ✅</option>
+                  <option value="on">مقفلة 🔒</option>
+                </select>
+                <div class="hint">القفل يُخزَّن في Firebase: <code>settings/chatLocked</code></div>
+              </div>
+              <div class="field">
+                <label>إجراءات خطيرة</label>
+                <div class="admin-actions">
+                  <button class="btn danger" id="adminChatClearAll">🧨 مسح كل الرسائل</button>
+                </div>
+                <div class="hint">سيتم حذف جميع الرسائل من Firebase. هذا لا يمكن التراجع عنه.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECURITY -->
+          <section class="admin-panel" id="tab-security">
+            <div class="form-row">
+              <div class="field">
+                <label>تغيير PIN المشرف</label>
+                <input id="adminNewPin" type="password" inputmode="numeric" placeholder="PIN جديد (4 أرقام مثلاً)" />
+                <div class="hint">يتم حفظه كـ Hash داخل المتصفح. الأفضل تعيينه على جهاز المشرف فقط.</div>
+              </div>
+              <div class="field">
+                <label>إجراءات</label>
+                <div class="admin-actions">
+                  <button class="btn violet" id="adminChangePin">💾 حفظ PIN الجديد</button>
+                  <button class="btn secondary" id="adminResetPin">↩️ إعادة PIN الافتراضي</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="hint">
+              ✅ لتحويل لوحة المشرف إلى حماية “حقيقية”:
+              <br>— نضيف Firebase Auth (تسجيل دخول المشرف)
+              <br>— ونكتب Rules تمنع أي كتابة إلا للمشرف
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  
+// ===== SHOW/HIDE TOOLS BASED ON ADMIN =====
+function showAdminTools() {
+    document.querySelector('.ticker-tools').style.display = 'flex';
+    document.querySelector('.toolbar').style.display = 'flex';
+}
+function hideAdminTools() {
+    document.querySelector('.ticker-tools').style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'none';
+}
+
+(() => {
+    "use strict";
+    const $ = (id) => document.getElementById(id);
+
+    // ===== Toast =====
+    function toast(message, type="ok", ms=2400){
+      const wrap = $("toastWrap");
+      const t = document.createElement("div");
+      t.className = `toast ${type}`;
+      const small = document.createElement("small");
+      small.textContent = message;
+      t.appendChild(small);
+      wrap.appendChild(t);
+      setTimeout
+// ===== SHOW/HIDE TOOLS BASED ON ADMIN =====
+function showAdminTools() {
+    document.querySelector('.ticker-tools').style.display = 'flex';
+    document.querySelector('.toolbar').style.display = 'flex';
+}
+function hideAdminTools() {
+    document.querySelector('.ticker-tools').style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'none';
+}
+
+(() => { t.style.opacity = "0"; t.style.transition = "opacity .2s ease"; }, ms - 250);
+      setTimeout(() => t.remove(), ms);
+    }
+
+    // ===== Helpers =====
+    const toNum = (v) => { const n = parseInt(v, 10); return Number.isNaN(n) ? null : n; };
+    const safeText = (s) => (s === undefined || s === null) ? "" : String(s);
+
+    function createBadge(phase){
+      const sp = document.createElement("span");
+      sp.className = "phase-badge " + (phase === "primary" ? "phase-primary" : "phase-middle");
+      sp.textContent = (phase === "primary" ? "ابتدائي" : "متوسط");
+      return sp;
+    }
+    function createTeamRow(name){
+      const d = document.createElement("div");
+      d.className = "team-row";
+      const icon = document.createElement("span"); icon.textContent = "👥";
+      const n = document.createElement("span"); n.textContent = safeText(name);
+      d.append(icon, n);
+      return d;
+    }
+
+    // ====== بيانات المباريات ======
+    const matchDataMiddle = {
+      1:{id:1,date:'الاثنين 23 فبراير 2026',a:'علي مباركي',b:'يحيى جابر كريري',next:{id:5,slot:'a'}},
+      2:{id:2,date:'الثلاثاء 24 فبراير 2026',a:'عبدالله سامي احمد محمد حسين هزازي',b:'تركي احمد هزازي',next:{id:5,slot:'b'}},
+      3:{id:3,date:'الأربعاء 25 فبراير 2026',a:'عبد الملك اسماعيل مساوى',b:'ريان محمد حسن كريري',next:{id:6,slot:'a'}},
+      4:{id:4,date:'الخميس 26 فبراير 2026',a:'نواف السحاري',b:'عادل احمد حسن عريشي',next:{id:6,slot:'b'}},
+      5:{id:5,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 1',b:'الفائز من مباراة 2',next:{id:7,slot:'a'}},
+      6:{id:6,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 3',b:'الفائز من مباراة 4',next:{id:7,slot:'b'}},
+      7:{id:7,date:'الثلاثاء 3 مارس 2026',a:'الفائز من مباراة 5',b:'الفائز من مباراة 6'}
+    };
+    const matchDataPrimary = {
+      1:{id:1,date:'الاثنين 23 فبراير 2026',a:'اسامه محمد عواجي صايغ',b:'سلمان محمد علي حارثي',next:{id:9,slot:'a'}},
+      2:{id:2,date:'الثلاثاء 24 فبراير 2026',a:'هاشم منور المنور',b:'نواف أحمد هادي هزازي',next:{id:9,slot:'b'}},
+      3:{id:3,date:'الأربعاء 25 فبراير 2026',a:'محمد محسن جبريـر هزازي',b:'فهد صولان هزازي',next:{id:10,slot:'a'}},
+      4:{id:4,date:'الخميس 26 فبراير 2026',a:'هاني بدر محمد سلامي',b:'محمد محسن محمد كريري',next:{id:10,slot:'b'}},
+      5:{id:5,date:'الاثنين 23 فبراير 2026',a:'احمد منصور هزازي',b:'علي فهد هزازي',next:{id:11,slot:'a'}},
+      6:{id:6,date:'الثلاثاء 24 فبراير 2026',a:'كنان احمد حسن عريشي',b:'سلمان صولان هزازي',next:{id:11,slot:'b'}},
+      7:{id:7,date:'الأربعاء 25 فبراير 2026',a:'محمد عبدالله علواني',b:'عبدالرحمن عبدالله يحيى هزازي',next:{id:12,slot:'a'}},
+      8:{id:8,date:'الخميس 26 فبراير 2026',a:'(باي)',b:'(باي)',next:{id:12,slot:'b'},bye:true},
+      9:{id:9,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 1',b:'الفائز من مباراة 2',next:{id:13,slot:'a'}},
+      10:{id:10,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 3',b:'الفائز من مباراة 4',next:{id:13,slot:'b'}},
+      11:{id:11,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 5',b:'الفائز من مباراة 6',next:{id:14,slot:'a'}},
+      12:{id:12,date:'الأحد 1 مارس 2026',a:'الفائز من مباراة 7',b:'(باي)',next:{id:14,slot:'b'}},
+      13:{id:13,date:'الاثنين 2 مارس 2026',a:'الفائز من مباراة 9',b:'الفائز من مباراة 10',next:{id:15,slot:'a'}},
+      14:{id:14,date:'الاثنين 2 مارس 2026',a:'الفائز من مباراة 11',b:'الفائز من مباراة 12',next:{id:15,slot:'b'}},
+      15:{id:15,date:'الثلاثاء 3 مارس 2026',a:'الفائز من مباراة 13',b:'الفائز من مباراة 14'}
+    };
+
+    // Storage keys (كما هي عندك)
+    const KEY_PRIMARY = 'PRIMARY_FOOTBALL_BRACKET_V1';
+    const KEY_MIDDLE  = 'MIDDLE_SCHOOL_FOOTBALL_BRACKET_V1';
+
+    let overridePrimary = null, overrideMiddle = null;
+
+    function getState(key, override){
+      if (override && typeof override === "object") return override;
+      try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; }
+    }
+    function setState(key, obj){
+      localStorage.setItem(key, JSON.stringify(obj));
+    }
+    function classify(aScore, bScore, winner, bye){
+      const A = toNum(aScore), B = toNum(bScore);
+      if (bye) return "upcoming";
+      if (A === null && B === null && !winner) return "upcoming";
+      if (A !== null && B !== null && !winner) return "live";
+      if (winner && A !== null && B !== null) return "result";
+      return "upcoming";
+    }
+    function buildItems(phase, data, state){
+      const arr = [];
+      Object.values(data).sort((a,b)=>a.id-b.id).forEach(m => {
+        const s = state[m.id] || {};
+        arr.push({ phase, ...m,
+          aScore: (s.aScore ?? ""), bScore: (s.bScore ?? ""), winner: (s.winner ?? ""),
+          kind: classify(s.aScore, s.bScore, s.winner, !!m.bye)
+        });
+      });
+      return arr;
+    }
+    function newsTitleText(it){
+      if (it.kind === "result" && it.winner){
+        const a = toNum(it.aScore), b = toNum(it.bScore);
+        const loser = (it.winner === it.a) ? it.b : it.a;
+        const score = (a !== null && b !== null) ? `${a}–${b}` : "—";
+        return `فوز ${it.winner} على ${loser} بنتيجة ${score}`;
+      }
+      if (it.kind === "live"){
+        return `مباراة جارية: ${it.a} × ${it.b} — النتيجة ${it.aScore || "—"} : ${it.bScore || "—"}`;
+      }
+      return `مباراة قادمة: ${it.a} × ${it.b}`;
+    }
+
+    // ===== Render (ذكي) =====
+    let lastSignature = "";
+    function render(){
+      const sp = getState(KEY_PRIMARY, overridePrimary);
+      const sm = getState(KEY_MIDDLE,  overrideMiddle);
+      const ip = buildItems("primary", matchDataPrimary, sp);
+      const im = buildItems("middle",  matchDataMiddle,  sm);
+      const all = [...ip, ...im];
+
+      const signature = JSON.stringify({
+        sp, sm,
+        live: all.filter(i=>i.kind==="live").map(i=>[i.phase,i.id,i.aScore,i.bScore]),
+        res:  all.filter(i=>i.kind==="result").map(i=>[i.phase,i.id,i.winner,i.aScore,i.bScore])
+      });
+      if (signature === lastSignature) return;
+      lastSignature = signature;
+
+      const news = [
+        ...all.filter(i=>i.kind==="result").slice(-8),
+        ...all.filter(i=>i.kind==="live"),
+        ...all.filter(i=>i.kind==="upcoming").slice(0,6)
+      ].slice(-12);
+
+      const live = all.filter(i=>i.kind==="live");
+      const upcoming = all.filter(i=>i.kind==="upcoming").sort((a,b)=>a.id-b.id).slice(0,12);
+      const results = all.filter(i=>i.kind==="result").sort((a,b)=>b.id-a.id).slice(0,12);
+
+      // NEWS
+      const newsList = $("newsList"); newsList.innerHTML = "";
+      if (!news.length){
+        const e = document.createElement("div"); e.className="empty"; e.textContent="لا توجد أخبار حالياً."; newsList.appendChild(e);
+      } else {
+        [...news].reverse().forEach(i => {
+          const item=document.createElement("div"); item.className="news-item";
+          const badge=createBadge(i.phase);
+          const body=document.createElement("div");
+          const title=document.createElement("div"); title.className="news-title"; title.textContent=newsTitleText(i);
+          const meta=document.createElement("div"); meta.className="news-meta"; meta.textContent=`مباراة ${i.id} • ${safeText(i.date)}`;
+          body.append(title,meta);
+          const icon=document.createElement("div"); icon.textContent="⚽";
+          item.append(badge,body,icon);
+          newsList.appendChild(item);
+        });
+      }
+
+      // LIVE
+      const liveList = $("liveList"); liveList.innerHTML="";
+      if(!live.length){
+        const e=document.createElement("div"); e.className="empty"; e.textContent="لا توجد مباريات جارية حالياً."; liveList.appendChild(e);
+      } else {
+        live.forEach(i=>{
+          const card=document.createElement("div"); card.className="match-card";
+          const badge=createBadge(i.phase);
+          const a=createTeamRow(i.a);
+          const score=document.createElement("div"); score.className="score"; score.textContent=`${i.aScore || "—"} : ${i.bScore || "—"}`;
+          const b=createTeamRow(i.b);
+          card.append(badge,a,score,b);
+          liveList.appendChild(card);
+        });
+      }
+
+      // UPCOMING
+      const upc=$("upcomingList"); upc.innerHTML="";
+      if(!upcoming.length){
+        const e=document.createElement("div"); e.className="empty"; e.textContent="لا توجد مباريات قادمة."; upc.appendChild(e);
+      } else {
+        upcoming.forEach(i=>{
+          const row=document.createElement("div"); row.className="row";
+          const badge=createBadge(i.phase);
+          const mid=document.createElement("div");
+          mid.append(createTeamRow(i.a), document.createTextNode(" "), (()=>{const s=document.createElement("span"); s.className="chip"; s.textContent="vs"; return s;})(), document.createTextNode(" "), createTeamRow(i.b));
+          const date=document.createElement("span"); date.className="chip"; date.textContent=safeText(i.date);
+          row.append(badge,mid,date);
+          upc.appendChild(row);
+        });
+      }
+
+      // RESULTS
+      const res=$("resultsList"); res.innerHTML="";
+      if(!results.length){
+        const e=document.createElement("div"); e.className="empty"; e.textContent="لا توجد نتائج مسجلة."; res.appendChild(e);
+      } else {
+        results.forEach(i=>{
+          const row=document.createElement("div"); row.className="row";
+          const badge=createBadge(i.phase);
+          const winner=document.createElement("div"); winner.className="news-title";
+          const loser=(i.winner===i.a)?i.b:i.a;
+          winner.textContent=`الفائز: ${safeText(i.winner)} — هزم ${safeText(loser)}`;
+          const a=toNum(i.aScore), b=toNum(i.bScore);
+          const score=document.createElement("span"); score.className="score"; score.style.fontSize="14px";
+          score.textContent=(a!==null && b!==null)?`${a} : ${b}`:"—";
+          row.append(badge,winner,score);
+          res.appendChild(row);
+        });
+      }
+    }
+
+    // ===== Ticker (محلي) =====
+    const TKEY="JZN_TICKER_NEWS_V1";
+    let tickerNews=[];
+    function loadTicker(){ try{return JSON.parse(localStorage.getItem(TKEY)||"[]")}catch{return[]} }
+    function saveTicker(){ localStorage.setItem(TKEY, JSON.stringify(tickerNews)); }
+    function renderTicker(){
+      const track=$("tickerTrack"); track.innerHTML="";
+      const list=tickerNews.length?[...tickerNews,...tickerNews]:[{text:"لا توجد أخبار عاجلة حالياً.",time:""}];
+      list.forEach(x=>{
+        const item=document.createElement("span"); item.className="ticker-item";
+        const dot=document.createElement("span"); dot.textContent="🟢";
+        const text=document.createElement("span"); text.className="text"; text.textContent=safeText(x.text);
+        const time=document.createElement("span"); time.className="time"; time.textContent=safeText(x.time);
+        item.append(dot,text,time); track.appendChild(item);
+      });
+    }
+
+    // ===== Firebase =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyAeBtPqFF2dzazJATl_h6WfHpzIi3Zup-c",
+      authDomain: "khubah-school-live--chat.firebaseapp.com",
+      databaseURL: "https://khubah-school-live--chat-default-rtdb.firebaseio.com",
+      projectId: "khubah-school-live--chat",
+      storageBucket: "khubah-school-live--chat.firebasestorage.app",
+      messagingSenderId: "602533917850",
+      appId: "1:602533917850:web:2d7870e884448cb8309b23",
+      measurementId: "G-XRRXCRC8WS"
+    };
+
+    let db=null;
+    let chatLocked=false;
+
+    async function waitForFirebase(timeoutMs=6000){
+      const start=performance.now();
+      while(performance.now()-start<timeoutMs){
+        if(window.firebase && typeof firebase.initializeApp==="function" && typeof firebase.database==="function") return true;
+        await new Promise(r=>setTimeout(r,60));
+      }
+      return false;
+    }
+    function setFbStatus(ok, text){
+      const dot=$("fbDot"), t=$("fbStatusText");
+      t.textContent=text;
+      dot.className="dot " + (ok ? "ok" : "err");
+      $("fbStatusPill").title=text;
+    }
+    async function initFirebase(){
+      const ok=await waitForFirebase();
+      if(!ok){ setFbStatus(false,"Firebase غير متاح"); toast("Firebase لم يتم تحميله.","err",3600); return; }
+      try{
+        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db=firebase.database();
+        setFbStatus(true,"Firebase متصل ✅");
+        toast("تم ربط Firebase ✅","ok",1800);
+        listenChatLock();
+      }catch(e){
+        console.error(e);
+        setFbStatus(false,"خطأ تهيئة Firebase");
+        toast("خطأ في تهيئة Firebase.","err",3600);
+      }
+    }
+
+    function listenChatLock(){
+      if(!db) return;
+      db.ref("settings/chatLocked").on("value", snap=>{
+        chatLocked = !!snap.val();
+        applyChatLockUI();
+      });
+    }
+    function applyChatLockUI(){
+      const hint=$("chatLockHint");
+      const input=$("chatMsg");
+      const btn=$("chatSend");
+      if(chatLocked){
+        hint.style.display="block";
+        input.disabled=true;
+        btn.disabled=true;
+        btn.style.opacity=".7";
+      } else {
+        hint.style.display="none";
+        input.disabled=false;
+        btn.disabled=false;
+        btn.style.opacity="1";
+      }
+      // عكس ذلك في لوحة المشرف إن كانت مفتوحة
+      if($("adminChatLock")){
+        $("adminChatLock").value = chatLocked ? "on" : "off";
+      }
+    }
+
+    // ===== Chat =====
+    function getOrAskUsername(){
+      let username=localStorage.getItem("jzn_chat_username");
+      if(!username){
+        username=(prompt("أدخل اسمك للمشاركة في النقاش:","مستخدم")||"مستخدم").trim() || "مستخدم";
+        localStorage.setItem("jzn_chat_username", username);
+      }
+      return username;
+    }
+    function appendChatMessage(m){
+      const box=$("chatBox");
+      const div=document.createElement("div"); div.className="msg";
+      const meta=document.createElement("div"); meta.className="meta";
+      meta.textContent = `${safeText(m.user)} • ${safeText(m.time)}`;
+      const text=document.createElement("div"); text.textContent=safeText(m.text);
+      div.append(meta,text);
+      box.appendChild(div);
+      box.scrollTop=box.scrollHeight;
+    }
+    function bindChat(){
+      const username=getOrAskUsername();
+      const input=$("chatMsg"), sendBtn=$("chatSend");
+
+      const send=async ()=>{
+        const txt=input.value.trim();
+        if(!txt) return;
+        if(chatLocked){ toast("الدردشة مقفلة 🔒","warn",2000); return; }
+        if(!db || typeof db.ref!=="function"){ toast("الدردشة غير متصلة.","err",2400); return; }
+
+        try{
+          await db.ref("messages").push({
+            user:username,
+            text:txt,
+            time:new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"})
+          });
+          input.value=""; input.focus();
+        }catch(e){
+          console.error(e);
+          toast("فشل إرسال الرسالة.","err",2400);
+        }
+      };
+
+      sendBtn.addEventListener("click", send);
+      input.addEventListener("keydown", e => { if(e.key==="Enter") send(); });
+
+      // Listen
+      try{
+        if(db){
+          db.ref("messages").limitToLast(80).on("child_added", snap=>{
+            const m=snap.val();
+            if(m && typeof m==="object") appendChatMessage(m);
+          });
+        }
+      }catch(e){
+        console.error(e);
+        toast("تعذر تشغيل الاستماع للدردشة.","warn",2600);
+      }
+    }
+
+    // ===== Imports/Exports + Tools =====
+    function readJsonFile(file, cb){
+      const r=new FileReader();
+      r.onload=()=>{ try{ cb(JSON.parse(r.result)); }catch{ toast("ملف JSON غير صالح","err",2400); } };
+      r.readAsText(file,"utf-8");
+    }
+
+    function bindTools(){
+      // ticker buttons (العلوي)
+      $("tickerAdd").addEventListener("click", ()=>{
+        const inp=$("tickerInput");
+        const text=inp.value.trim();
+        if(!text) return;
+        tickerNews.push({text, time:new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"})});
+        saveTicker(); renderTicker();
+        inp.value=""; inp.focus();
+        toast("تمت إضافة الخبر ✅","ok",1600);
+      });
+      $("tickerClear").addEventListener("click", ()=>{
+        if(!confirm("مسح كل الأخبار العاجلة؟")) return;
+        tickerNews=[]; saveTicker(); renderTicker();
+        toast("تم مسح الأخبار.","warn",1600);
+      });
+      $("tickerExport").addEventListener("click", ()=>{
+        const blob=new Blob([JSON.stringify(tickerNews,null,2)],{type:"application/json"});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a"); a.href=url; a.download="jzn_ticker_news.json"; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),500);
+        toast("تم التصدير ✅","ok",1500);
+      });
+      $("tickerImport").addEventListener("change", e=>{
+        const f=e.target.files[0]; if(!f) return;
+        readJsonFile(f, d=>{
+          if(!Array.isArray(d)) throw 0;
+          tickerNews=d.filter(x=>x&&typeof x.text==="string").map(x=>({text:x.text,time:safeText(x.time)}));
+          saveTicker(); renderTicker();
+          toast("تم الاستيراد ✅","ok",2000);
+        });
+        e.target.value="";
+      });
+
+      // overrides import
+      $("import-primary").addEventListener("change", e=>{
+        const f=e.target.files[0]; if(!f) return;
+        readJsonFile(f, d=>{ overridePrimary=d; lastSignature=""; render(); toast("تم استيراد حالة الابتدائي ✅","ok",2000); });
+        e.target.value="";
+      });
+      $("import-middle").addEventListener("change", e=>{
+        const f=e.target.files[0]; if(!f) return;
+        readJsonFile(f, d=>{ overrideMiddle=d; lastSignature=""; render(); toast("تم استيراد حالة المتوسط ✅","ok",2000); });
+        e.target.value="";
+      });
+
+      $("btn-refresh").addEventListener("click", ()=>{ lastSignature=""; render(); toast("تم التحديث ✅","ok",1400); });
+      $("btn-clear").addEventListener("click", ()=>{
+        overridePrimary=null; overrideMiddle=null; lastSignature=""; render();
+        toast("تم مسح الحالات المخصّصة.","warn",1800);
+      });
+
+      setInterval(render, 8000);
+      window.addEventListener("storage", ()=>{ lastSignature=""; render(); });
+    }
+
+    // =========================
+    // 🛡 Admin Dashboard
+    // =========================
+    const ADMIN_HASH_KEY="JZN_ADMIN_PIN_HASH_V1";
+    const DEFAULT_PIN="2580";
+    let isAdmin=false;
+
+    async function sha256(text){
+      const data=new TextEncoder().encode(text);
+      const hash=await crypto.subtle.digest("SHA-256", data);
+      return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+
+    async function ensureAdminHash(){
+      // إذا لم يوجد hash محفوظ، ننشئه من PIN الافتراضي
+      const saved=localStorage.getItem(ADMIN_HASH_KEY);
+      if(saved) return saved;
+      const h=await sha256(DEFAULT_PIN);
+      localStorage.setItem(ADMIN_HASH_KEY, h);
+      return h;
+    }
+
+    function openAdmin(){ $("adminBackdrop").style.display="flex"; }
+    function closeAdmin(){ $("adminBackdrop").style.display="none"; }
+
+    function setAdminTabsEnabled(enabled){
+      ["tabBtnMatches","tabBtnTicker","tabBtnChat","tabBtnSecurity"].forEach(id=>{
+        const b=$(id);
+        b.disabled = !enabled;
+        b.style.opacity = enabled ? "1" : ".6";
+      });
+      $("adminLogoutBtn").disabled = !enabled;
+    }
+
+    function switchTab(tabId){
+      document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tabId));
+      document.querySelectorAll(".admin-panel").forEach(p=>p.classList.toggle("active", p.id===tabId));
+    }
+
+    // ===== Admin: Matches editor =====
+    function getDataByPhase(phase){ return phase==="primary" ? matchDataPrimary : matchDataMiddle; }
+    function getKeyByPhase(phase){ return phase==="primary" ? KEY_PRIMARY : KEY_MIDDLE; }
+
+    function fillMatchSelect(){
+      const phase=$("adminPhase").value;
+      const data=getDataByPhase(phase);
+      const sel=$("adminMatchId");
+      sel.innerHTML="";
+      Object.values(data).sort((a,b)=>a.id-b.id).forEach(m=>{
+        const opt=document.createElement("option");
+        opt.value=String(m.id);
+        opt.textContent=`مباراة ${m.id} — ${m.a} × ${m.b}`;
+        sel.appendChild(opt);
+      });
+      updateMatchEditor();
+    }
+
+    function updateMatchEditor(){
+      const phase=$("adminPhase").value;
+      const data=getDataByPhase(phase);
+      const id=parseInt($("adminMatchId").value,10);
+      const match=data[id];
+      if(!match) return;
+
+      $("adminMatchInfo").value = `مباراة ${match.id}\n${match.a} × ${match.b}\n${safeText(match.date)}`;
+      // winner options
+      const win=$("adminWinner");
+      win.innerHTML="";
+      const opt0=document.createElement("option"); opt0.value=""; opt0.textContent="— بدون فائز (مباراة جارية) —";
+      const optA=document.createElement("option"); optA.value=match.a; optA.textContent=`🏆 ${match.a}`;
+      const optB=document.createElement("option"); optB.value=match.b; optB.textContent=`🏆 ${match.b}`;
+      win.append(opt0,optA,optB);
+
+      // Load current state from localStorage (وليس override)
+      const key=getKeyByPhase(phase);
+      const st=getState(key, null);
+      const s=st[id] || {};
+      $("adminAScore").value = (s.aScore ?? "");
+      $("adminBScore").value = (s.bScore ?? "");
+      $("adminWinner").value = (s.winner ?? "");
+    }
+
+    function saveMatchState({winnerMode}){
+      const phase=$("adminPhase").value;
+      const id=parseInt($("adminMatchId").value,10);
+      const key=getKeyByPhase(phase);
+      const st=getState(key, null);
+
+      const aScore=$("adminAScore").value;
+      const bScore=$("adminBScore").value;
+
+      if(aScore==="" || bScore===""){
+        toast("أدخل أهداف الفريقين أولاً.","err",2200);
+        return;
+      }
+
+      const data=getDataByPhase(phase);
+      const match=data[id];
+
+      const winner = (winnerMode==="result") ? $("adminWinner").value : "";
+      if(winnerMode==="result" && !winner){
+        toast("حدد الفائز لتسجيل نتيجة.","err",2200);
+        return;
+      }
+
+      st[id] = { aScore: String(aScore), bScore: String(bScore), winner: winner ? String(winner) : "" };
+      setState(key, st);
+
+      // إلغاء override حتى يظهر التحديث الفعلي
+      if(phase==="primary") overridePrimary=null; else overrideMiddle=null;
+
+      lastSignature="";
+      render();
+      toast(winnerMode==="result" ? "تم حفظ النتيجة 🏁" : "تم حفظ كـ مباراة جارية 🎯","ok",2000);
+    }
+
+    function clearMatchState(){
+      const phase=$("adminPhase").value;
+      const id=parseInt($("adminMatchId").value,10);
+      const key=getKeyByPhase(phase);
+      const st=getState(key, null);
+      delete st[id];
+      setState(key, st);
+
+      if(phase==="primary") overridePrimary=null; else overrideMiddle=null;
+
+      $("adminAScore").value="";
+      $("adminBScore").value="";
+      $("adminWinner").value="";
+      lastSignature="";
+      render();
+      toast("تم مسح الحالة وإرجاعها لقادمة ✅","warn",2200);
+    }
+
+    // ===== Admin: Ticker manager =====
+    function refreshAdminTickerList(){
+      const box=$("adminTickerList");
+      box.innerHTML="";
+      if(!tickerNews.length){
+        const e=document.createElement("div");
+        e.className="small-item";
+        e.textContent="لا توجد أخبار حالياً.";
+        box.appendChild(e);
+        return;
+      }
+      tickerNews.slice().reverse().forEach((x, idxRev)=>{
+        const idx = tickerNews.length - 1 - idxRev;
+        const row=document.createElement("div");
+        row.className="small-item";
+        const left=document.createElement("div");
+        const b=document.createElement("b"); b.textContent = x.text;
+        const small=document.createElement("div"); small.className="hint"; small.textContent = x.time ? `⏱ ${x.time}` : "";
+        left.append(b, small);
+
+        const actions=document.createElement("div");
+        actions.style.display="flex"; actions.style.gap="8px"; actions.style.flexWrap="wrap";
+
+        const del=document.createElement("button");
+        del.className="btn danger";
+        del.textContent="حذف";
+        del.onclick=()=>{
+          tickerNews.splice(idx,1);
+          saveTicker(); renderTicker(); refreshAdminTickerList();
+          toast("تم حذف الخبر.","warn",1800);
+        };
+
+        actions.append(del);
+        row.append(left, actions);
+        box.appendChild(row);
+      });
+    }
+
+    // ===== Admin: Chat moderation =====
+    async function adminSetChatLock(lockOn){
+      if(!db){ toast("Firebase غير متصل.","err",2400); return; }
+      try{
+        await db.ref("settings/chatLocked").set(!!lockOn);
+        toast(lockOn ? "تم قفل الدردشة 🔒" : "تم فتح الدردشة ✅", "ok", 2000);
+      }catch(e){
+        console.error(e);
+        toast("فشل تحديث حالة الدردشة.","err",2400);
+      }
+    }
+
+    async function adminClearAllMessages(){
+      if(!db){ toast("Firebase غير متصل.","err",2400); return; }
+      if(!confirm("تحذير: سيتم حذف جميع الرسائل نهائياً. هل أنت متأكد؟")) return;
+      const confirm2 = prompt("اكتب كلمة DELETE للتأكيد:");
+      if(confirm2 !== "DELETE"){ toast("تم الإلغاء.","warn",1800); return; }
+      try{
+        await db.ref("messages").remove();
+        toast("تم مسح جميع الرسائل 🧨","warn",2600);
+      }catch(e){
+        console.error(e);
+        toast("فشل حذف الرسائل.","err",2400);
+      }
+    }
+
+    // ===== Admin: Login/PIN =====
+    async function adminLogin(){
+      const pin=$("adminPinInput").value.trim();
+      if(!pin){ toast("أدخل PIN.","err",1800); return; }
+      const saved=await ensureAdminHash();
+      const h=await sha256(pin);
+      if(h !== saved){
+        toast("PIN غير صحيح.","err",2000);
+        return;
+      }
+      isAdmin=true; showAdminTools();
+      setAdminTabsEnabled(true);
+      toast("مرحبًا مشرف ✅","ok",1600);
+      // افتح تب النتائج مباشرة
+      $("tabBtnMatches").disabled=false;
+      switchTab("tab-matches");
+      // تجهيز لوحات
+      fillMatchSelect();
+      refreshAdminTickerList();
+      applyChatLockUI();
+    }
+
+    function adminLogout(){ hideAdminTools();
+      isAdmin=false;
+      setAdminTabsEnabled(false);
+      $("adminPinInput").value="";
+      switchTab("tab-login");
+      toast("تم تسجيل الخروج.","warn",1600);
+    }
+
+    async function adminChangePin(){
+      if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); return; }
+      const np=$("adminNewPin").value.trim();
+      if(np.length < 4){ toast("اختر PIN من 4 أرقام أو أكثر.","err",2200); return; }
+      const h=await sha256(np);
+      localStorage.setItem(ADMIN_HASH_KEY, h);
+      $("adminNewPin").value="";
+      toast("تم تغيير PIN ✅","ok",2000);
+    }
+
+    async function adminResetPin(){
+      if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); return; }
+      if(!confirm("إرجاع PIN الافتراضي 2580؟")) return;
+      const h=await sha256(DEFAULT_PIN);
+      localStorage.setItem(ADMIN_HASH_KEY, h);
+      toast("تمت إعادة PIN الافتراضي ✅","ok",2000);
+    }
+
+    function bindAdminUI(){
+      // Open/Close modal
+      $("btn-admin").addEventListener("click", ()=>{ openAdmin(); switchTab(isAdmin?"tab-matches":"tab-login"); });
+      $("adminClose").addEventListener("click", closeAdmin);
+      $("adminBackdrop").addEventListener("click", (e)=>{ if(e.target.id==="adminBackdrop") closeAdmin(); });
+
+      // Tabs
+      document.querySelectorAll(".tab-btn").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          if(btn.disabled) return;
+          switchTab(btn.dataset.tab);
+          if(btn.dataset.tab==="tab-ticker") refreshAdminTickerList();
+          if(btn.dataset.tab==="tab-matches") updateMatchEditor();
+        });
+      });
+
+      // Login/Logout
+      $("adminLoginBtn").addEventListener("click", adminLogin);
+      $("adminPinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") adminLogin(); });
+      $("adminLogoutBtn").addEventListener("click", adminLogout);
+
+      // Matches editor
+      $("adminPhase").addEventListener("change", fillMatchSelect);
+      $("adminMatchId").addEventListener("change", updateMatchEditor);
+      $("adminSaveLive").addEventListener("click", ()=>saveMatchState({winnerMode:"live"}));
+      $("adminSaveResult").addEventListener("click", ()=>saveMatchState({winnerMode:"result"}));
+      $("adminClearMatch").addEventListener("click", ()=>{ if(confirm("مسح حالة هذه المباراة؟")) clearMatchState(); });
+
+      // Ticker manager
+      $("adminTickerAdd").addEventListener("click", ()=>{
+        if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); return; }
+        const text=$("adminTickerText").value.trim();
+        if(!text) return;
+        tickerNews.push({text, time:new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"})});
+        saveTicker(); renderTicker();
+        $("adminTickerText").value="";
+        refreshAdminTickerList();
+        toast("تمت إضافة خبر ✅","ok",1600);
+      });
+      $("adminTickerReload").addEventListener("click", ()=>{ tickerNews=loadTicker(); renderTicker(); refreshAdminTickerList(); toast("تم تحديث القائمة.","ok",1400); });
+      $("adminTickerWipe").addEventListener("click", ()=>{
+        if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); return; }
+        if(!confirm("مسح جميع أخبار العاجل؟")) return;
+        tickerNews=[]; saveTicker(); renderTicker(); refreshAdminTickerList();
+        toast("تم مسح أخبار العاجل.","warn",1800);
+      });
+
+      // Chat moderation
+      $("adminChatLock").addEventListener("change", async ()=>{
+        if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); $("adminChatLock").value = chatLocked ? "on" : "off"; return; }
+        await adminSetChatLock($("adminChatLock").value==="on");
+      });
+      $("adminChatClearAll").addEventListener("click", async ()=>{
+        if(!isAdmin){ toast("سجّل دخول أولاً.","err",1800); return; }
+        await adminClearAllMessages();
+      });
+
+      // Security PIN
+      $("adminChangePin").addEventListener("click", adminChangePin);
+      $("adminResetPin").addEventListener("click", adminResetPin);
+    }
+
+    // ===== Start =====
+    window.addEventListener("DOMContentLoaded", async () => {
+      tickerNews = loadTicker();
+      renderTicker();
+      bindTools();
+      bindAdminUI();
+      await ensureAdminHash();
+      render();
+
+      await initFirebase();
+      bindChat();
+      applyChatLockUI();
+    });
+
+  })();
+  </script>
+
+<script>
+// ===== Firebase Real-Time bindings (Ticker + Brackets) =====
+(function(){
+  // Wait until initFirebase() sets `db`
+  function whenDbReady(cb){
+    let tries=0; const t=setInterval(function(){
+      tries++; if (window.db && typeof db.ref==='function'){ clearInterval(t); cb(); }
+      else if (tries>200){ clearInterval(t); console.warn('DB not ready'); }
+    }, 50);
+  }
+
+  whenDbReady(function(){
+    // --- Live listeners ---
+    try {
+      // Ticker live
+      db.ref('ticker/items').on('value', function(snap){
+        const obj = snap.val() || {};
+        // Normalize to array for existing UI
+        window.tickerNews = Object.values(obj).map(function(v){
+          return { text: String(v.text||''), time: String(v.time||'') };
+        });
+        if (typeof renderTicker==='function') renderTicker();
+        if (typeof refreshAdminTickerList==='function') refreshAdminTickerList();
+      });
+
+      // Brackets live (primary/middle)
+      db.ref('brackets/primary').on('value', function(s){ window.overridePrimary = s.val() || null; if (typeof render==='function'){ window.lastSignature=''; render(); } });
+      db.ref('brackets/middle').on('value', function(s){ window.overrideMiddle = s.val() || null; if (typeof render==='function'){ window.lastSignature=''; render(); } });
+    } catch(e){ console.error('Live bindings error:', e); }
+
+    // --- Re-bind admin-controlled actions to write to RTDB ---
+    function mustBeAdmin(){ if(!window.isAdmin){ if (typeof toast==='function') toast('سجّل دخول المشرف أولاً.', 'err', 2000); return false; } return true; }
+
+    // Ticker buttons
+    var elAdd = document.getElementById('tickerAdd');
+    if (elAdd){ elAdd.onclick = async function(){ if(!mustBeAdmin()) return false; var inp=document.getElementById('tickerInput'); var text=(inp&&inp.value||'').trim(); if(!text) return false; var stamp=new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}); try{ await db.ref('ticker/items').push({text:text, time:stamp}); if(inp) inp.value=''; if (typeof toast==='function') toast('تمت إضافة الخبر ✅','ok',1400); }catch(e){ console.error(e); if (typeof toast==='function') toast('فشل إضافة الخبر','err',1800);} return false; }; }
+
+    var elClear = document.getElementById('tickerClear');
+    if (elClear){ elClear.onclick = async function(){ if(!mustBeAdmin()) return false; if(!confirm('مسح كل أخبار العاجل؟')) return false; try{ await db.ref('ticker/items').remove(); if (typeof toast==='function') toast('تم المسح','warn',1400);}catch(e){ console.error(e); if (typeof toast==='function') toast('فشل المسح','err',1800);} return false; } }
+
+    var elExport = document.getElementById('tickerExport');
+    if (elExport){ elExport.onclick = async function(){ try{ var snap = await db.ref('ticker/items').get(); var obj = snap.val()||{}; var arr = Object.values(obj); var blob=new Blob([JSON.stringify(arr,null,2)],{type:'application/json'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download='jzn_ticker_news.json'; a.click(); setTimeout(function(){URL.revokeObjectURL(url)},500); if (typeof toast==='function') toast('تم التصدير ✅','ok',1400);}catch(e){ console.error(e); if (typeof toast==='function') toast('فشل التصدير','err',1800);} return false; } }
+
+    var elImport = document.getElementById('tickerImport');
+    if (elImport){ elImport.onchange = function(e){ if(!mustBeAdmin()) { e.target.value=''; return; } var f=e.target.files&&e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload = async function(){ try{ var d=JSON.parse(r.result); if(!Array.isArray(d)) throw 0; var ref=db.ref('ticker/items'); for (var i=0;i<d.length;i++){ var x=d[i]; if(x && typeof x.text==='string'){ await ref.push({text:String(x.text), time:String(x.time||'')}); } } if (typeof toast==='function') toast('تم الاستيراد إلى RTDB ✅','ok',1600); } catch(err){ if (typeof toast==='function') toast('JSON غير صالح','err',1800);} }; r.readAsText(f,'utf-8'); e.target.value=''; }; }
+
+    // Brackets: import/export/save/clear via admin controls already present
+    // Override buttons to write to RTDB rather than localStorage
+    // Save Live / Result
+    var btnSaveLive = document.getElementById('adminSaveLive');
+    if(btnSaveLive){ btnSaveLive.onclick = async function(){ if(!mustBeAdmin()) return false; var phase=document.getElementById('adminPhase').value; var id=parseInt(document.getElementById('adminMatchId').value,10); var aScore=document.getElementById('adminAScore').value.trim(); var bScore=document.getElementById('adminBScore').value.trim(); if(aScore===''||bScore===''){ if (typeof toast==='function') toast('أدخل أهداف الفريقين','err',1800); return false; } try{ await db.ref('brackets/'+phase+'/'+id).set({aScore:String(aScore), bScore:String(bScore), winner:''}); if (typeof toast==='function') toast('تم حفظ كـ جارية 🎯','ok',1400);}catch(e){ console.error(e); if (typeof toast==='function') toast('تعذر الحفظ','err',1800);} return false; } }
+
+    var btnSaveResult = document.getElementById('adminSaveResult');
+    if(btnSaveResult){ btnSaveResult.onclick = async function(){ if(!mustBeAdmin()) return false; var phase=document.getElementById('adminPhase').value; var id=parseInt(document.getElementById('adminMatchId').value,10); var aScore=document.getElementById('adminAScore').value.trim(); var bScore=document.getElementById('adminBScore').value.trim(); var winner=document.getElementById('adminWinner').value.trim(); if(aScore===''||bScore===''||!winner){ if (typeof toast==='function') toast('أدخل الأهداف وحدد الفائز','err',1800); return false; } try{ await db.ref('brackets/'+phase+'/'+id).set({aScore:String(aScore), bScore:String(bScore), winner:String(winner)}); if (typeof toast==='function') toast('تم حفظ النتيجة 🏁','ok',1400);}catch(e){ console.error(e); if (typeof toast==='function') toast('تعذر الحفظ','err',1800);} return false; } }
+
+    var btnClearMatch = document.getElementById('adminClearMatch');
+    if(btnClearMatch){ btnClearMatch.onclick = async function(){ if(!mustBeAdmin()) return false; if(!confirm('مسح حالة هذه المباراة؟')) return false; var phase=document.getElementById('adminPhase').value; var id=parseInt(document.getElementById('adminMatchId').value,10); try{ await db.ref('brackets/'+phase+'/'+id).remove(); document.getElementById('adminAScore').value=''; document.getElementById('adminBScore').value=''; document.getElementById('adminWinner').value=''; if (typeof toast==='function') toast('تم المسح ✅','warn',1500);}catch(e){ console.error(e); if (typeof toast==='function') toast('فشل المسح','err',1800);} return false; } }
+
+    // Bulk import to brackets using top import buttons
+    var impPrimary = document.getElementById('import-primary');
+    if (impPrimary){ impPrimary.onchange = function(e){ if(!mustBeAdmin()) { e.target.value=''; return; } var f=e.target.files&&e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload = async function(){ try{ var d=JSON.parse(r.result)||{}; await db.ref('brackets/primary').set(d); if (typeof toast==='function') toast('تم استيراد الابتدائي إلى RTDB ✅','ok',1600);}catch(err){ if (typeof toast==='function') toast('JSON غير صالح','err',1800);} }; r.readAsText(f,'utf-8'); e.target.value=''; } }
+
+    var impMiddle = document.getElementById('import-middle');
+    if (impMiddle){ impMiddle.onchange = function(e){ if(!mustBeAdmin()) { e.target.value=''; return; } var f=e.target.files&&e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload = async function(){ try{ var d=JSON.parse(r.result)||{}; await db.ref('brackets/middle').set(d); if (typeof toast==='function') toast('تم استيراد المتوسط إلى RTDB ✅','ok',1600);}catch(err){ if (typeof toast==='function') toast('JSON غير صالح','err',1800);} }; r.readAsText(f,'utf-8'); e.target.value=''; } }
+
+    // Top refresh/clear buttons now just trigger rerender; clearing overrides is not needed with RTDB listeners
+    var topRefresh = document.getElementById('btn-refresh'); if (topRefresh){ topRefresh.onclick = function(){ if (typeof render==='function'){ window.lastSignature=''; render(); toast('تم التحديث ✅','ok',1200);} return false; } }
+    var topClear = document.getElementById('btn-clear'); if (topClear){ topClear.onclick = async function(){ if(!mustBeAdmin()) return false; if(!confirm('مسح الحالات من RTDB (ابتدائي + متوسط)؟')) return false; try{ await db.ref('brackets/primary').remove(); await db.ref('brackets/middle').remove(); if (typeof toast==='function') toast('تم المسح.','warn',1400);}catch(e){ console.error(e); if (typeof toast==='function') toast('فشل المسح','err',1800);} return false; } }
+  });
+})();
+</script>
+
+</body>
+</html>
