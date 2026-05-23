@@ -6,38 +6,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>حاسبة النفقة | مكتب الدغريري</title>
-<meta name="description" content="احسب-احسبي النفقة بسهولة واحصل-احصلي على استشارة قانونية دقيقة من مكتب الدغريري">
+<meta name="description" content="احسب النفقة بسهولة واحصل على استشارة قانونية دقيقة من مكتب الدغريري">
 
-<!-- ✅ خط Cairo الفخم والمهني -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* ✅ تهيئة الخلفية */
+/* ✅ تهيئة الخلفية المتناسقة */
 body {
   font-family: 'Cairo', sans-serif;
   margin: 0;
   background: radial-gradient(circle at center, #1e88e5 0%, #0a4b78 100%);
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 
-/* ✅ كرت الحاسبة (افتراضياً بدون تدوير لضمان عمل اللمس على الجوال) */
+/* ✅ كرت الحاسبة */
 .calculator-box {
   width: 90%;
   max-width: 440px;
-  padding: 35px 25px;
+  padding: 30px 25px;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
+  margin-bottom: 20px;
 }
 
-/* 🛠️ حل المشكلة: التأثير ثلاثي الأبعاد يشتغل فقط على أجهزة الكمبيوتر التي تدعم الماوس */
+/* ✅ تصميم الترويسة البديلة الفخمة لضمان عدم ظهور أيقونة "الصورة مكسورة" */
+.header-brading {
+  background: linear-gradient(135deg, #fff3dd 0%, #fbe7c6 100%);
+  padding: 15px;
+  border-radius: 14px;
+  border: 2px solid #D4AF37;
+  text-align: center;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.header-brading h2 {
+  color: #5d4037;
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.header-brading p {
+  color: #8d6e63;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 4px 0 0 0;
+  letter-spacing: 0.5px;
+}
+
+/* في حال رغبتك باستخدام صورة مستقبلاً، هذا التنسيق يضمن ظهورها بشكل مثالي */
+.header-image-container {
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+  display: none; /* يتم تحويله إلى block عند وضع رابط صورة حقيقي */
+}
+
+.header-image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* التفاعل عند تحريك الماوس للكمبيوتر فقط لضمان سلامة اللمس في الآيفون */
 @media (hover: hover) {
   body {
     perspective: 1200px;
@@ -57,7 +100,7 @@ body {
 h3 {
   text-align: center;
   color: #0a4b78;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0 0 10px 0;
 }
@@ -80,7 +123,7 @@ input {
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
-  -webkit-appearance: none; /* لمنع سفاري من تغيير التصميم */
+  -webkit-appearance: none;
 }
 
 input:focus {
@@ -88,7 +131,7 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
 }
 
-/* ✅ زر الحساب الرئيسي المطور كلياً للجوال والآيفون */
+/* ✅ زر الحساب الرئيسي */
 .btn-calc {
   width: 100%;
   padding: 15px;
@@ -102,9 +145,6 @@ input:focus {
   cursor: pointer;
   margin-top: 10px;
   box-shadow: 0 4px 10px rgba(10, 75, 120, 0.25);
-  
-  /* خصائص هامة لـ iOS لضمان قبول النقرة فورا */
-  cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
@@ -112,7 +152,7 @@ input:focus {
 
 .btn-calc:active {
   background: #10598c;
-  transform: scale(0.98); /* تأثير ضغط خفيف مريح على الجوال */
+  transform: scale(0.98);
 }
 
 /* ✅ صندوق النتيجة */
@@ -130,7 +170,7 @@ input:focus {
   border-right: 4px solid #1e88e5;
 }
 
-/* ✅ صندوق الـ CTA */
+/* ✅ صندوق الـ CTA الداخلي */
 .cta-box {
   margin-top: 25px;
   padding: 20px;
@@ -147,7 +187,7 @@ input:focus {
   margin-bottom: 18px;
 }
 
-/* ✅ زر "قدم استشارتك الآن" المجسم للجوال والكمبيوتر */
+/* ✅ زر "قدم استشارتك الآن" المجسم */
 .btn-3d-container {
   position: relative;
   display: inline-block;
@@ -186,7 +226,6 @@ input:focus {
   transition: transform 0.1s ease;
 }
 
-/* عند النقر أو اللمس الفعلي للزر ثلاثي الأبعاد */
 .btn-3d-container:active .btn-3d-front {
   transform: translateY(6px);
 }
@@ -210,6 +249,41 @@ input:focus {
 .maps-link:active {
   color: #1e88e5;
 }
+
+/* ✅ زر العودة إلى الموقع الرئيسي الثابت أسفل الصفحة */
+.btn-back-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 440px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.btn-back-home:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-back-home:active {
+  transform: translateY(0);
+}
+
+.btn-back-home span {
+  margin-left: 8px;
+}
 </style>
 
 </head>
@@ -218,9 +292,14 @@ input:focus {
 
 <div class="calculator-box">
 
+  <div class="header-brading">
+    <h2>المحامي حسن بن يحيى دغريري</h2>
+    <p>مكتب الدغريري للمحاماة والاستشارات القانونية والتوثيق</p>
+  </div>
+
   <h3>حاسبة النفقة التقريبية</h3>
   <p class="top-text">
-    احسب-احسبي نفقتك خلال ثوانٍ واحصل-احصلي على تقدير قانوني دقيق
+    احسب نفقتك خلال ثوانٍ واحصل على تقدير قانوني دقيق
   </p>
 
   <input type="number" id="salary" inputmode="numeric" placeholder="راتب الزوج (ريال)">
@@ -231,6 +310,10 @@ input:focus {
   <div id="result" class="result-box"></div>
 
 </div>
+
+<a href="https://www.dghreeri.com" class="btn-back-home">
+  <span>🌐</span> العودة إلى الموقع الرئيسي لمكتب الدغريري
+</a>
 
 <script>
 function calculate() {
@@ -271,7 +354,7 @@ function calculate() {
         النفقة تتأثر بالتزامات الزوج الأخرى. احصل على تقدير قانوني دقيق ومضمون من محامينا.
       </div>
       
-      <a href="https://dghreeri.com/%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A7%D8%AA-%D9%82%D8%A7%D9%86%D9%88%D9%86%D9%8A%D8%A9" 
+      <a href="https://dghreeri.com/%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A7%D8%AA-%D9%82%D8%A7%D9%8%D9%88%D9%86%D9%8A%D8%A9" 
          target="_blank" 
          class="btn-3d-container">
         <span class="btn-3d-shadow"></span>
@@ -283,7 +366,7 @@ function calculate() {
       <a href="https://www.google.com/maps?ll=16.672284,42.959138&z=16&t=m&hl=ar&gl=US&mapclient=embed&q=16%C2%B040%2720.2%22N+42%C2%B057%2732.9%22E+16.672284,+42.959138@16.6722839,42.9591377" 
          target="_blank" 
          class="maps-link">
-         📍 أو تفضل-تفضلي بزيارة مكتبنا
+         📍 أو تفضل بزيارة مكتبنا
       </a>
     </div>
   `;
